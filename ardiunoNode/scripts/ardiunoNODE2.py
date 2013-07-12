@@ -1,14 +1,14 @@
 #!/usr/bin/env python
-import roslib; roslib.load_manifest('ardiunoCommunicationPackage')
+import roslib; roslib.load_manifest('ardiunoNode')
 import rospy
 
 import re #yeah, we're using REGEX.
 import serial
 
-from std_msgs.msg import String
-from std_msgs.msg import Float32
-from std_msgs.msg import Int32
-from ardiunoCommunicationPackage.msg import SensorStructure #look this up
+from std_msgs.msg import String		#just in case we need to publish dummy messages
+from std_msgs.msg import Float32	#for the float values
+from std_msgs.msg import Int32		#for the int values
+from ardiunoNode.msg import Sensor #look this up
 ''' new stuff'''
 import time, struct
 from threading import Thread
@@ -43,16 +43,18 @@ class SerialMonitor(Thread): # SerialMonitor extends Thread
 	rospy.loginfo(rospy.get_name() + " SerialMonitor: Thread starting.")
 	while not rospy.is_shutdown():
 		if(ser.inWaiting() > 0):
-			msgSensor = SensorStructure()
+			msgSensors = Sensors()
 			line = ser.readline()
 			rospy.loginfo(line)
 			threeFloats = floatRE.findall(line)
 		 	rospy.loginfo( msgSensor.sonarDistance )
 			#rospy.longinfo( str(msgSensor.sonarDistance) + " " + str(msgSensor.sonarIntensity) + " " + str(msgSensor.irDistance) + " " + str(msgSensor.irDistance2) )			
-            msgSensor2 = SensorStructure()
+			msgSensors.x = threeFloats[0]
+			msgSensors.y = threeFloats[1]
+			msgSensors.z = threeFloats[2]
 			pub.publish(msgSensor)
-        	#twoInts = intRE.findall(msg)
-        	#oneFloat = floatRe.findall(msg)
+        		#twoInts = intRE.findall(msg)
+        		#oneFloat = floatRe.findall(msg)
 			#msg.header.stamp = rospy.get_rostime()
 	self.seqno += 1
                     
@@ -71,7 +73,7 @@ def callback(cmd):
                         
 if __name__ == '__main__':
 	#the port randomly changes w/ the usb, so, sadly, this is necessary.
-	pub = rospy.Publisher('sonarReadings', SensorStructure)
+	pub = rospy.Publisher('ardiunoReadings', Sensors)
 	rospy.init_node('talker')
 	for x in range(0,10):
 		port = '/dev/ttyACM' + str(x)
