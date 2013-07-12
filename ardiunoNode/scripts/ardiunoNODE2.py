@@ -8,7 +8,7 @@ import serial
 from std_msgs.msg import String		#just in case we need to publish dummy messages
 from std_msgs.msg import Float32	#for the float values
 from std_msgs.msg import Int32		#for the int values
-from ardiunoNode.msg import Sensor #look this up
+from ardiunoNode.msg import Sensors #look this up
 ''' new stuff'''
 import time, struct
 from threading import Thread
@@ -47,12 +47,12 @@ class SerialMonitor(Thread): # SerialMonitor extends Thread
 			line = ser.readline()
 			rospy.loginfo(line)
 			threeFloats = floatRE.findall(line)
-		 	rospy.loginfo( msgSensor.sonarDistance )
 			#rospy.longinfo( str(msgSensor.sonarDistance) + " " + str(msgSensor.sonarIntensity) + " " + str(msgSensor.irDistance) + " " + str(msgSensor.irDistance2) )			
 			msgSensors.x = threeFloats[0]
 			msgSensors.y = threeFloats[1]
 			msgSensors.z = threeFloats[2]
-			pub.publish(msgSensor)
+			rospy.loginfo(str(threeFloats[0]))
+			pub.publish(msgSensors)
         		#twoInts = intRE.findall(msg)
         		#oneFloat = floatRe.findall(msg)
 			#msg.header.stamp = rospy.get_rostime()
