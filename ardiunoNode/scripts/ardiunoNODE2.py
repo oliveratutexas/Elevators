@@ -36,26 +36,37 @@ class SerialMonitor(Thread): # SerialMonitor extends Thread
   def __init__(self, ser, pub):
 	Thread.__init__(self, name="SerialMonitor") # Call superclass constructor
 	self.ser = ser
+	print ser.inWaiting()
 	self.seqno = 0
 	self.pub = pub
 
   def run(self):
 	rospy.loginfo(rospy.get_name() + " SerialMonitor: Thread starting.")
-	while not rospy.is_shutdown():
-		if(ser.inWaiting() > 0):
+	while not rospy.is_shutdown():		
+		if(self.ser.inWaiting() > 0):
+			print "serial buffer"
 			msgSensors = Sensors()
 			line = ser.readline()
 			rospy.loginfo(line)
 			threeFloats = floatRE.findall(line)
-			#rospy.longinfo( str(msgSensor.sonarDistance) + " " + str(msgSensor.sonarIntensity) + " " + str(msgSensor.irDistance) + " " + str(msgSensor.irDistance2) )			
-			msgSensors.x = threeFloats[0]
-			msgSensors.y = threeFloats[1]
-			msgSensors.z = threeFloats[2]
+			if(len(threeFloats) > 2):
+				msgSensors.x = threeFloats[0]
+				msgSensors.y = threeFloats[1]
+				msgSensors.z = threeFloats[2]
+			else:
+				msgSensors.x = -1.0
+				msgSensors.y = -1.0
+				msgSensors.z = -1.0
 			rospy.loginfo(str(threeFloats[0]))
-			pub.publish(msgSensors)
-        		#twoInts = intRE.findall(msg)
-        		#oneFloat = floatRe.findall(msg)
-			#msg.header.stamp = rospy.get_rostime()
+			
+			mockData = Sensors()
+			mockData.x = 0.0
+			mockData.y = 0.0
+			mockData.z = 0.0
+
+
+			pub.publish(mockData)
+
 	self.seqno += 1
                     
             
@@ -73,8 +84,8 @@ def callback(cmd):
                         
 if __name__ == '__main__':
 	#the port randomly changes w/ the usb, so, sadly, this is necessary.
-	pub = rospy.Publisher('ardiunoReadings', Sensors)
 	rospy.init_node('talker')
+	pub = rospy.Publisher('arduinoReadings', Sensors)
 	for x in range(0,10):
 		port = '/dev/ttyACM' + str(x)
 		baud = 115200
@@ -98,11 +109,19 @@ if __name__ == '__main__':
 		rospy.logerr("Unable to open serial port\nExiting.")
 		sys.exit()	
 	#what does this do?
-	ser.flushInput()
+	print ser.inWaiting()
+	#ser.flushInput()
+	print "after flush" + str(ser.inWaiting())
 
     # Create and start a serial monitor thread.
     # This is for receiving light level information.
 	smThread = SerialMonitor(ser, pub)
 	smThread.start()
-	
+        """
+        while not rospy.is_shutdown():
+        	data = Sensors(0.0, 0.0, 0.0)
+                print "hello: " + str(data)
+                pub.publish(data)
+                rospy.sleep(1.0)
+        """
 	rospy.spin()
