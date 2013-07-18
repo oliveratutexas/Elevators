@@ -49,23 +49,36 @@ class SerialMonitor(Thread): # SerialMonitor extends Thread
 			line = ser.readline()
 			rospy.loginfo(line)
 			threeFloats = floatRE.findall(line)
-			if(len(threeFloats) > 2):
-				msgSensors.x = threeFloats[0]
-				msgSensors.y = threeFloats[1]
-				msgSensors.z = threeFloats[2]
+			rospy.loginfo(threeFloats)
+			if len(threeFloats) > 2 :
+			#	if type(threeFloats[0]) == 'str':
+				msgSensors.x = float(threeFloats[0])
+			#	else:
+			#		msgSensors.x = 2.0
+			#	if type(threeFloats[1]) == 'str':
+				msgSensors.y = float(threeFloats[1])
+			#	else:
+			#		msgSensors.y = 2.0
+			#	if type(threeFloats[2]) == 'str':
+				msgSensors.z = float(threeFloats[2])
+			#	else:
+			#		msgSensors.z = 2.0
+				print type(threeFloats[0])
 			else:
 				msgSensors.x = -1.0
 				msgSensors.y = -1.0
 				msgSensors.z = -1.0
-			rospy.loginfo(str(threeFloats[0]))
 			
+			#rospy.loginfo(str(threeFloats[0]))
+			pub.publish(msgSensors)
+			"""
 			mockData = Sensors()
 			mockData.x = 0.0
 			mockData.y = 0.0
 			mockData.z = 0.0
-
-
-			pub.publish(mockData)
+			"""
+			
+			#pub.publish(mockData)
 
 	self.seqno += 1
                     
