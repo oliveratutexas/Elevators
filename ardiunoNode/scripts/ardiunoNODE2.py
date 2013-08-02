@@ -6,7 +6,7 @@ import re #yeah, we're using REGEX.
 import serial
 
 from std_msgs.msg import String		#just in case we need to publish dummy messages
-from std_msgs.msg import Float32	#for the float values
+from std_msgs.msg import Float64	#for the float values
 from std_msgs.msg import Int32		#for the int values
 from ardiunoNode.msg import Sensors #look this up
 ''' new stuff'''
