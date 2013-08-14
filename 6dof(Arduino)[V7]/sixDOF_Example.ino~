@@ -3,14 +3,14 @@
 #include <FIMU_ITG3200.h>
 
 #include <Wire.h>
-float conv = 0.00390625;
+
 float angles[3]; // yaw pitch roll
-float allValues[6];
+
 // Set the FreeSixIMU object
 FreeSixIMU sixDOF = FreeSixIMU();
 
 void setup() { 
-  Serial.begin(115200);
+  Serial.begin(9600);
   Wire.begin();
   
   delay(5);
@@ -20,14 +20,13 @@ void setup() {
 
 void loop() { 
   
-  sixDOF.getValues(allValues);
-  Serial.print("Velocities ");
-  Serial.print(allValues[0] * conv);
-  Serial.print(" | ");  
-  Serial.print(allValues[1] * conv);
-  Serial.print(" | ");
-  Serial.println(allValues[2] * conv);
+  sixDOF.getEuler(angles);
   
+  Serial.print(angles[0]);
+  Serial.print(" | ");  
+  Serial.print(angles[1]);
+  Serial.print(" | ");
+  Serial.println(angles[2]);
   
   delay(100); 
 }
