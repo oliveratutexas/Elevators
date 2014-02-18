@@ -8,6 +8,7 @@ import serial
 from std_msgs.msg import String		#just in case we need to publish dummy messages
 from std_msgs.msg import Float64	#for the float values
 from std_msgs.msg import Int32		#for the int values
+from std_msgs.msg import Time
 from ElevatorFloorReader.msg import Sensors #look this up
 ''' new stuff'''
 import time, struct
@@ -68,7 +69,7 @@ class SerialMonitor(Thread): # SerialMonitor extends Thread
 				msgSensors.x = -1.0
 				msgSensors.y = -1.0
 				msgSensors.z = -1.0
-			
+			msgSensors.time = rospy.get_rostime()
 			#rospy.loginfo(str(threeFloats[0]))
 			pub.publish(msgSensors)
 			"""

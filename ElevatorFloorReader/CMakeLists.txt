@@ -20,7 +20,8 @@ find_package(catkin REQUIRED COMPONENTS message_generation roscpp rospy std_msgs
 #######################################
 
 ## Generate messages in the 'msg' folder
- add_message_files(FILES
+ add_message_files(
+   FILES
    Sensors.msg
  )
 
@@ -70,16 +71,16 @@ include_directories(include
 # )
 
 ## Declare a cpp executable
-# add_executable(ElevatorFloorReader_node src/ElevatorFloorReader_node.cpp)
+add_executable(ElevatorFloorReader_node src/ElevatorListener.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(ElevatorFloorReader_node ElevatorFloorReader_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(ElevatorFloorReader_node
-#   ${catkin_LIBRARIES}
-# )
+  target_link_libraries(ElevatorFloorReader_node
+    ${catkin_LIBRARIES}
+  )
 
 #############
 ## Install ##

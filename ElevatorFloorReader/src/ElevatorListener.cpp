@@ -7,21 +7,14 @@
 #include <cmath>
 #include <vector>
 
-struct double_time{
-	double magnitude;
-	double time;
-};
 
-/*
- * A bucket of values
- */
 std::vector<double> curve;
+std::vector<ros::Time> times;
+
 ros::Publisher pub;
+
 double accumulatedDistance;
-int currentFloor;
-double x_0 = 0;
-double v_0 = 0;
-double a_0 = 0;
+int currentFloor = 3;
 
 /*
  *	We assume that the floors in the building have a uniform distance between them.
@@ -38,9 +31,10 @@ double threshold = 0.5;
  * false: 	force of gravity is less than 1g + threshold
  */
 bool direction;
+double double_integrate();
 
 
-void callback(const ElevatorFloorReader::Sensors_ sen){
+void callback(const ElevatorFloorReader::Sensors sen){
 	
 	static int prev_sign = 1;
 	//invariant - the threshold will always be non-zero, therefore
@@ -48,6 +42,7 @@ void callback(const ElevatorFloorReader::Sensors_ sen){
 	if(abs(sen.y) > threshold && prev_sign * sen.y > 0 )
 	{
 		curve.push_back(sen.y);
+		times.push_back(ros::Time(sen.recieved_time));
 	}
 	else
 	{
@@ -61,13 +56,11 @@ void callback(const ElevatorFloorReader::Sensors_ sen){
 				currentFloor++;
 				accumulatedDistance = 0;
 			}
-
-			//went down a floor
-			if(accumulatedDistance <= -1 * distanceBetweenFloors ){
+			else
+			if(accumulatedDistance <=  distanceBetweenFloors ){
 				currentFloor--;
 				accumulatedDistance = 0;
 			}
-
 
 		}
 		//Account for changes in positive 
@@ -84,8 +77,10 @@ int main(int argc, char **argv){
 
 	ros::init(argc,argv,"Talker");
 	ros::NodeHandle n;
+
 	//For an initial acceleration
-	curve.push_back(a_0);
+	curve.push_back(0);
+	times.push_back(ros::Time(0.00));
 	ros::Subscriber sub = n.subscribe("subscriber_topic", 1, callback);
 	pub = n.advertise<std_msgs::Int32>("current_floor",1000);
 	return 0;
@@ -99,20 +94,19 @@ double double_integrate()
 
 	std::vector<double> velocity_curve;
 	velocity_curve.push_back(0.0);
-	std::vector<double> displacement_curve;
-	displacement_curve.push_back(0.0);
 
 	//take the trapezoidal sum between points that essentially "integrates"
 	for(int i = 0; i < curve.size() - 1; i++){
+		timeDifference = (times[i+1] - times[i]).toSec();
 		velocity_curve.push_back( ((curve[i] + curve[i + 1])/2) * timeDifference );
 	}
 
+	//
 	for(int i = 0; i < curve.size() - 1; i++){
-		displacement_curve.push_back( ((velocity_curve[i] + velocity_curve[i + 1])/2) * timeDifference );
+		timeDifference = (times[i + 1] - times[i]).toSec();
+		total += ((velocity_curve[i] + velocity_curve[i + 1])/2) * timeDifference; 
 	}
 	
-	total = std::accumulate(displacement_curve.begin(),displacement_curve.end(),0);
-
 	curve.clear();
 
 	return total;
