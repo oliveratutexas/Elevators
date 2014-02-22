@@ -69,7 +69,7 @@ class SerialMonitor(Thread): # SerialMonitor extends Thread
 				msgSensors.x = -1.0
 				msgSensors.y = -1.0
 				msgSensors.z = -1.0
-			msgSensors.time = rospy.get_rostime()
+			#msgSensors.time = rospy.get_rostime()
 			#rospy.loginfo(str(threeFloats[0]))
 			pub.publish(msgSensors)
 			"""
@@ -102,7 +102,7 @@ if __name__ == '__main__':
 	pub = rospy.Publisher('arduinoReadings', Sensors)
 	for x in range(0,10):
 		port = '/dev/ttyACM' + str(x)
-		baud = 115200
+		baud = 38400
 		rospy.loginfo("Serial(USB) port = %s", port)
 		rospy.loginfo("Serial baud = %i", baud)
 		#just to create a variable
