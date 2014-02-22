@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 FreeSixIMU::FreeSixIMU() {
 	acc = ADXL345();
-	//I added this so that it would return its lowest settings as values
+	//I added this so that it would return its lowest settings as values - OLIVER
 	acc.setRangeSetting(2);
 	gyro = ITG3200();
 	//magn = HMC58X3();

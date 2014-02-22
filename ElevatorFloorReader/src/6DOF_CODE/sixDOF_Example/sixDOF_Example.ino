@@ -6,6 +6,7 @@
 float conv = 0.00390625;
 float angles[3]; // yaw pitch roll
 float allValues[6];
+
 // Set the FreeSixIMU object
 FreeSixIMU sixDOF = FreeSixIMU();
 
